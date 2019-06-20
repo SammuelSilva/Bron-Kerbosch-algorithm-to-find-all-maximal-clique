@@ -84,38 +84,37 @@ void Graph::init_bron_kerbosch() {
 
 void Graph::bron_kerbosch(vector < int > answer, vector < int > adjacency, vector < int > duplicate) {
 
-	if (adjacency.empty() && duplicate.empty()) {
+	if (adjacency.empty() && duplicate.empty()) { //Caso o vetor de adjacentes e de duplicados for vazio, insere o clique na resposta
 		clique.insert(answer);
 		return;
 	}
 	
-	for (std::vector<int>::size_type vortex = 0; vortex < adjacency.size(); vortex++) {
+	for (std::vector<int>::size_type vortex = 0; vortex < adjacency.size(); vortex++) { //Para cada vertice do vetor adjacency
 		vector<int> intersection_P = {}, intersection_X = {};			
 
 		//neighbors(P)
-		for (int vortex_adj : adjacency_list[adjacency[vortex]]) {
+		for (int vortex_adj : adjacency_list[adjacency[vortex]]) { // Faz a interceção do vetor adjacency com os vizinhos do vertice (adjacency[vortex])
 			for (std::vector<int>::size_type aux = 0; aux < adjacency.size(); aux++)
 				if (vortex_adj == adjacency[aux])
 					intersection_P.push_back(adjacency[aux]);
 
 
 			//neighbors(X)
-			for (std::vector<int>::size_type aux = 0; aux < duplicate.size(); aux++) {
+			for (std::vector<int>::size_type aux = 0; aux < duplicate.size(); aux++) { // Faz a interceção do vetor adjacency com os vizinhos do vertice (duplicate[aux])
 				if (vortex_adj == duplicate[aux])
 					intersection_X.push_back(duplicate[aux]);
 			}
 			
 		}
 
-		answer.push_back(adjacency[vortex]);
+		answer.push_back(adjacency[vortex]); //Adiciona o vertice na resposta
 
-		bron_kerbosch(answer, intersection_P, intersection_X);
+		bron_kerbosch(answer, intersection_P, intersection_X); //Chama novamente a funcao
 
-		int temp = adjacency[vortex];
-		duplicate.push_back(temp);
-		answer.erase(remove(answer.begin(), answer.end(), temp), answer.end());
-		adjacency.erase(remove(adjacency.begin(), adjacency.end(), temp), adjacency.end());
+		duplicate.push_back(adjacency[vortex]); // Adciona o vertice como duplicado
+		answer.erase(remove(answer.begin(), answer.end(), adjacency[vortex]), answer.end()); // Remove o vertice da resposta
+		adjacency.erase(remove(adjacency.begin(), adjacency.end(), adjacency[vortex]), adjacency.end()); //Remove o vertice do conjunto de adjacency
 
-		vortex--;
+		vortex--; //Atrasa a posicao em 1
 	}
 }
