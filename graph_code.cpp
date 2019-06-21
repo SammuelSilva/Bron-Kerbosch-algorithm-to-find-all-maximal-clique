@@ -2,11 +2,10 @@
 
 static int counter = 0;
 
-//insere os dados de um vector que contem os graus para um map;
 int Graph::insert_degree(vector <int> aux_dg) {
 	bool ini = 0;
 	for (int i = 0; i < qnt_vortex; i++) {
-		degree.insert(pair<int, int>(i, aux_dg[i])); // i = vertice, aux_dg[i] == grau
+		degree.insert(pair<int, int>(i, aux_dg[i]));
 		if (aux_dg[i] == 1) 
 			ini+=1;
 		
@@ -21,7 +20,7 @@ int Graph::insert_degree(vector <int> aux_dg) {
 	return ini;
 }
 
-//Adiciona os K2 em clique e remove eles do grafo 
+
 void Graph::remove_small_clq(int qnt) {
 	for (auto it = degree.begin(); it != degree.end(); ++it) {
 
@@ -88,7 +87,7 @@ void Graph::print_clique() {
 	std::cout << "\nNumbers of cliques found: " << clique.size() << std::endl;
 
 	FILE* result;
-	if ((result = fopen("exit.txt", "w")) == NULL) { //Criação do arquivo de saida.txt
+	if ((result = fopen("exit.txt", "w")) == NULL) { //CriaÃ§Ã£o do arquivo de saida.txt
 		std::cout << "ERRO" << std::endl;
 		exit(1);
 	}
@@ -217,10 +216,7 @@ void Graph::bron_kerbosch(vector < int > answer, vector < int > adjacency, vecto
 		duplicate.push_back(adjacency[vortex]);
 		answer.erase(remove(answer.begin(), answer.end(), adjacency[vortex]), answer.end());
 		adjacency.erase(remove(adjacency.begin(), adjacency.end(), adjacency[vortex]), adjacency.end());
-		answer.erase(remove(answer.begin(), answer.end(), adjacency[vortex]), answer.end()); // Remove o vertice da resposta
-		adjacency.erase(remove(adjacency.begin(), adjacency.end(), adjacency[vortex]), adjacency.end()); //Remove o vertice do conjunto de adjacency
->>>>>>> 8e81d6e607c29d4651762bed55eabe735f236c4c
 
-		vortex--; //Atrasa a posicao em 1
+		vortex--;
 	}
 }
