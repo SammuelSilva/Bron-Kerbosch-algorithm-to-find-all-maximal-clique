@@ -1,6 +1,5 @@
 #include "graph_structure.h"
-#include <chrono>
-#include <iterator>
+
 using namespace std::chrono;
 
 int main(int argc, char const* argv[]) {
@@ -25,19 +24,26 @@ int main(int argc, char const* argv[]) {
 
 	Graph graph (quantityOfVortex);
 
-	for (int i = 0; i < quantityOfVortex; i++) {
+	for (int i = 0; i < quantityOfVortex; i++)
 		all_vortex.push_back(0);
-	}
+	
 
 	while (fscanf(file, "%c %d %d '\n'", &c_trash, &vortex_one, &vortex_two) != EOF) {
 		graph.insert_vortex(vortex_one - 1, vortex_two - 1);
 		all_vortex[vortex_one - 1]++;
 		all_vortex[vortex_two - 1]++;
 	}
+	//graph.print_graph();
+
+	int qnt_k2 = graph.insert_degree(all_vortex);
+
 
 	fclose(file);
 
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+	if (qnt_k2 != 0)
+		graph.remove_small_clq(qnt_k2);
 
 	graph.init_bron_kerbosch();
 

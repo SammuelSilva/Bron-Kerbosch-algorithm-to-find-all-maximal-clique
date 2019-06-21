@@ -1,5 +1,57 @@
 #include "graph_structure.h"
 
+static int counter = 0;
+
+//insere os dados de um vector que contem os graus para um map;
+int Graph::insert_degree(vector <int> aux_dg) {
+	bool ini = 0;
+	for (int i = 0; i < qnt_vortex; i++) {
+		degree.insert(pair<int, int>(i, aux_dg[i])); // i = vertice, aux_dg[i] == grau
+		if (aux_dg[i] == 1) 
+			ini+=1;
+		
+	}
+
+	for (auto itr = degree.begin(); itr != degree.end(); ++itr)
+		std::cout << "Vortex: " << itr->first << ", Degree: " << itr->second << std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << "K2 Quantity: " << ini << std::endl << std::endl;
+	return ini;
+}
+
+//Adiciona os K2 em clique e remove eles do grafo 
+void Graph::remove_small_clq(int qnt) {
+	for (auto it = degree.begin(); it != degree.end(); ++it) {
+
+		if (qnt == 0)
+			break;
+
+		if (it->second > 1 || it->second < 0)
+			continue;
+
+		int aux  = it->first;
+		int aux2 = *adjacency_list[aux].begin();
+		clique.insert(vector<int> { aux, aux2 });
+		adjacency_list[aux2].remove(aux);
+		adjacency_list.erase(adjacency_list.begin() + aux);
+
+		degree.erase(it);
+
+		for (auto tmp = degree.begin(); tmp != degree.end(); ++tmp)
+			if (tmp->first == aux2) {
+				tmp->second = -1;
+				qnt_vortex--;
+				qnt--;
+				break;
+			}
+					
+		
+	}
+
+	//print_graph();
+}
 
 Graph::Graph(int size) {
 	qnt_vortex = size;
@@ -34,6 +86,20 @@ void Graph::print_graph() {
 void Graph::print_clique() {
 
 	std::cout << "\nNumbers of cliques found: " << clique.size() << std::endl;
+
+	FILE* result;
+	if ((result = fopen("exit.txt", "w")) == NULL) { //Criação do arquivo de saida.txt
+		std::cout << "ERRO" << std::endl;
+		exit(1);
+	}
+	char trash = '|';
+	for (auto it = clique.begin(); it != clique.end(); ++it) {
+		for (int i = 0; i < (*it).size(); i++)
+			fprintf(result, "%d " " ", (*it)[i]);
+		fprintf(result, "%c " " \n", trash);
+	}
+
+	fclose(result);
 
 }
 
@@ -70,25 +136,62 @@ void Graph::sort() {
 		adjacency_list[vortex].sort();
 	}
 }
+/*
+vector<int> Graph::choose_pivot(vector <int> v1, vector <int> v2) {
+	vector <int> aux = {};
+	vector <int> aux_2 = {};
+
+	for (int i = 0; i < v1.size(); i++) {
+		aux.push_back(v1[i]);
+		aux_2.push_back(v1[i]);
+		for (int j = 0; j < v2.size(); j++)
+			if (v1[i] != v2[i])
+				aux.push_back(v2[i]);
+	}
+
+	int ammount = 0;
+	int position = 0;
+
+	for(int i = 0; i < aux.size(); i++)
+		if (dg[aux[i]]->degree > ammount) {
+			ammount = dg[aux[i]]->degree;
+			position = i;
+		}
+	
+	for (int vortex_adj : adjacency_list[position])
+		aux_2.erase(remove(aux_2.begin(), aux_2.end(), vortex_adj), aux_2.end());
+
+	return aux_2;
+}
+*/
 
 void Graph::init_bron_kerbosch() {
 	vector < int > answer, adjacency, duplicate;
-	std::cout << "LOOKING FOR CLIQUES" << std::endl;
 
 	for (std::vector<int>::size_type i = 0; i < adjacency_list.size(); i++)
 		adjacency.push_back(i);
-	
 
+	std::cout << "LOOKING FOR CLIQUES" << std::endl;
 	bron_kerbosch(answer, adjacency, duplicate);
+
+
+	std::cout << "Calls: " << counter << std::endl;
 }
+static long long int x = 100000;
 
 void Graph::bron_kerbosch(vector < int > answer, vector < int > adjacency, vector < int > duplicate) {
-
+	counter++;
 	if (adjacency.empty() && duplicate.empty()) {
 		clique.insert(answer);
 		return;
 	}
-	
+	if (counter == x) {
+		std::cout << ">= " << counter << std::endl;
+		x += 1000000;
+	}
+	//std::cout << &answer << " " << &adjacency << " " << &duplicate << std::endl;
+	//vector<int> adjacency_temp = choose_pivot(adjacency, duplicate);
+
 	for (std::vector<int>::size_type vortex = 0; vortex < adjacency.size(); vortex++) {
 		vector<int> intersection_P = {}, intersection_X = {};			
 
@@ -111,10 +214,9 @@ void Graph::bron_kerbosch(vector < int > answer, vector < int > adjacency, vecto
 
 		bron_kerbosch(answer, intersection_P, intersection_X);
 
-		int temp = adjacency[vortex];
-		duplicate.push_back(temp);
-		answer.erase(remove(answer.begin(), answer.end(), temp), answer.end());
-		adjacency.erase(remove(adjacency.begin(), adjacency.end(), temp), adjacency.end());
+		duplicate.push_back(adjacency[vortex]);
+		answer.erase(remove(answer.begin(), answer.end(), adjacency[vortex]), answer.end());
+		adjacency.erase(remove(adjacency.begin(), adjacency.end(), adjacency[vortex]), adjacency.end());
 
 		vortex--;
 	}
