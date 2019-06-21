@@ -217,7 +217,10 @@ void Graph::bron_kerbosch(vector < int > answer, vector < int > adjacency, vecto
 		duplicate.push_back(adjacency[vortex]);
 		answer.erase(remove(answer.begin(), answer.end(), adjacency[vortex]), answer.end());
 		adjacency.erase(remove(adjacency.begin(), adjacency.end(), adjacency[vortex]), adjacency.end());
+		answer.erase(remove(answer.begin(), answer.end(), adjacency[vortex]), answer.end()); // Remove o vertice da resposta
+		adjacency.erase(remove(adjacency.begin(), adjacency.end(), adjacency[vortex]), adjacency.end()); //Remove o vertice do conjunto de adjacency
+>>>>>>> 8e81d6e607c29d4651762bed55eabe735f236c4c
 
-		vortex--;
+		vortex--; //Atrasa a posicao em 1
 	}
 }
